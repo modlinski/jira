@@ -1,0 +1,31 @@
+*Test Cases:*
+
+* IntegrationTest/Neff/TestChildLock/TestPRJXENE1325_ChildLockWithDoorLatchAtSelfClean.py:TestPRJXENE1325ChildLockDoorLatchtSelfClean.TestEnterCleanModeDoorLatchOnChildLockOn
+** *Given* 'Cleaning Mode' menu is opened and 'DoorLatch' is turned on; 'Pyrolytic Self-Cleaning mode' is started.
+** *When* 'ChildLock' is turned on.
+** *Then* 'ChildLock' icon is displayed and 'DoorLatch' icon is not displayed on the screen.
+* IntegrationTest/Neff/TestChildLock/TestPRJXENE1325_ChildLockWithDoorLatchAtSelfClean.py:TestPRJXENE1325ChildLockDoorLatchtSelfClean.TestSelectSelfCleanDoorLatchOnChildLockOn
+** *Given* 'Pyrolytic Self-Cleaning mode' in 'Cleaning Mode' menu is selected and 'DoorLatch' is turned on; 'Pyrolytic Self-Cleaning mode' is started.
+** *When* 'ChildLock' is turned on.
+** *Then* 'ChildLock' icon is displayed and 'DoorLatch' icon is not displayed on the screen.
+* IntegrationTest/Neff/TestChildLock/TestPRJXENE1325_ChildLockWithDoorLatchAtSelfClean.py:TestPRJXENE1325ChildLockDoorLatchtSelfClean.TestConfirmSelfCleanDoorLatchOnChildLockOn
+** *Given* 'Pyrolytic Self-Cleaning mode' in 'Cleaning Mode' menu is selected and confirmed by taping button 'Cleaning'; 'DoorLatch' is turned on;
+  'Pyrolytic Self-Cleaning mode' is started.
+** *When* 'ChildLock' is turned on.
+** *Then* 'ChildLock' icon is displayed and 'DoorLatch' icon is not displayed on the screen.
+* IntegrationTest/Neff/TestChildLock/TestPRJXENE1325_ChildLockWithDoorLatchAtSelfClean.py:TestPRJXENE1325ChildLockDoorLatchtSelfClean.TestStartSelfCleanDoorLatchOnChildLockOn
+** *Given* 'Pyrolytic Self-Cleaning mode' is started and 'DoorLatch' is turned on.
+** *When* 'ChildLock' is turned on.
+** *Then* 'ChildLock' icon is displayed and 'DoorLatch' icon is not displayed on the screen.
+* IntegrationTest/Neff/TestChildLock/TestPRJXENE1325_ChildLockWithDoorLatchAtSelfClean.py:TestPRJXENE1325ChildLockDoorLatchtSelfClean.TestSelectSelfCleanChildLockOnDoorLatchOn
+** *Given* 'Pyrolytic Self-Cleaning mode' is started and 'ChildLock' is turned on.
+** *When* 'DoorLatch' is turned on.
+** *Then* 'DoorLatch' icon is displayed and 'ChildLock' icon is not displayed on the screen.
+* IntegrationTest/Neff/TestChildLock/TestPRJXENE1325_ChildLockWithDoorLatchAtSelfClean.py:TestPRJXENE1325ChildLockDoorLatchtSelfClean.TestSelectSelfCleanChildLockOnDoorLatchOnDoorLatchOff
+** *Given* 'Pyrolytic Self-Cleaning mode' is started; 'ChildLock' and 'DoorLatch' are turned on.
+** *When* 'DoorLatch' is turned off.
+** *Then* 'ChildLock' icon is displayed and 'DoorLatch' icon is not displayed on the screen.
+* IntegrationTest/Neff/TestChildLock/TestPRJXENE1325_ChildLockWithDoorLatchAtSelfClean.py:TestPRJXENE1325ChildLockDoorLatchtSelfClean.TestSelectSelfCleanChildLockOnDoorLatchOnChildLockOff
+** *Given* 'Pyrolytic Self-Cleaning mode' is started; 'ChildLock' and 'DoorLatch' are turned on.
+** *When* 'ChildLock' is turned off.
+** *Then* 'DoorLatch' icon and 'ChildLock' icon are not displayed on the screen.

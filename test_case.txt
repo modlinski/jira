@@ -1,0 +1,370 @@
+"""
+Created on Apr 26, 2017
+@author: extModlinski
+http://trttsewweb04:8080/browse/PRJXENE-1325
+"""
+#system imports
+from time import sleep
+
+#nose imports
+import nose
+from nose.plugins.attrib import attr
+
+#framework imports
+from IntegrationTest.Neff.TestBaseNeff import TestBaseNeff
+from IntegrationTest.TestBase import Button
+from IntegrationTest.TestBase import Encoder
+from IntegrationTest.TestBase import EncoderActions
+from IntegrationTest.TestBase import HmiTime
+
+
+class TestPRJXENE1325ChildLockDoorLatchtSelfClean(TestBaseNeff):
+    
+    CL_DELAY = 4100  # 4,1 seconds
+    MEDIUM_DELAY = (HmiTime.Medium/1000)  # 1 seconds
+    LONG_DELAY = (HmiTime.Long/1000)  # 3 seconds
+    
+    def setup(self):
+        print "setup TestPRJXENE1325ChildLockDoorLatchtSelfClean"
+        print "Test story: " + "http://trttsewweb04:8080/browse/PRJXENE-1325"
+        TestBaseNeff.setup(self)
+        
+    def teardown(self):
+        print "teardown TestPRJXENE1325ChildLockDoorLatchtSelfClean"
+        TestBaseNeff.teardown(self)
+        
+    def _DoorLatchOnEcoClean(self):
+        """
+        Method turning on DoorLatch in EcoClean mode.
+        """
+        self.tf.DoorLatch(True)
+        assert self.tf.screen.ContainsText("PTX_NF54_NOTICE_FULL_2L_TUER_VERRIEGELT", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_ECOCLEAN", bgColor=self.tf.colors.NeffDarkGray)
+        assert self.tf.IsDoorLatchActive()
+        
+    def _DoorLatchOnSelfClean(self):
+        """
+        Method turning on DoorLatch in Pyrolytic Self-Cleaning mode.
+        """
+        self.tf.DoorLatch(True)
+        assert self.tf.screen.ContainsText("PTX_NF54_NOTICE_FULL_2L_TUER_VERRIEGELT", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.NeffDarkGray)
+        assert self.tf.IsDoorLatchActive()
+        
+    def _DoorLatchOnRemoveAccessories(self):
+        """
+        Method turning on DoorLatch when notification about necessity of removing accessories from oven is displayed.
+        """
+        self.tf.DoorLatch(True)
+        assert self.tf.screen.ContainsText("PTX_NF54_NOTICE_FULL_2L_TUER_VERRIEGELT", bgColor=self.tf.colors.Black)
+#         assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_TEXT_3L_10L_ENTFERNEN_SIE_UNGEEIGNETES_ZUBEHOER_LOSE_SPEISERESTE", bgColor=self.tf.colors.NeffDarkGray, hAlign=self.tf.horizontalAlignment.Center) # variant 1
+#         assert self.tf.screen.ContainsText("PTX_NF54_NOTICE_TEXT_3L_10L_ENTFERNEN_SIE_ZUBEHOER_ZUBEHOER__TRAEGER_LOSE_SPEISERESTE", bgColor=self.tf.colors.NeffDarkGray, hAlign=self.tf.horizontalAlignment.Center) # variant 2
+        sleep(self.MEDIUM_DELAY)
+        assert self.tf.IsDoorLatchActive()
+        
+    def _DoorLatchOnSelfCleanStarted(self):
+        """
+        Method turning on DoorLatch in Pyrolytic Self-Cleaning mode, if mode is started.
+        """
+        self.tf.DoorLatch(True)
+        assert self.tf.screen.ContainsText("PTX_NF54_NOTICE_FULL_2L_TUER_VERRIEGELT", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.Black)
+        assert self.tf.IsDoorLatchActive()
+        
+    def _DoorLatchOff(self):
+        """
+        Method turning off DoorLatch.
+        """
+        self.tf.DoorLatch(False)
+        assert not self.tf.IsDoorLatchActive()
+        
+    def _ChildLockOnSelfClean(self):
+        """
+        Method turning on ChildLock in Pyrolytic Self-Cleaning mode.
+        """
+        self.tf.ButtonTap(Button.Clock, self.CL_DELAY)
+        assert self.tf.screen.ContainsText("PTX_NF54_NOTICE_FULL_2L_KINDERSICHERUNG_AKTIVIERT", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.Black)
+        
+    def _ChildLockOffSelfClean(self):
+        """
+        Method turning off ChildLock in Pyrolytic Self-Cleaning mode.
+        """
+        self.tf.ButtonTap(Button.Clock, self.CL_DELAY)
+        assert self.tf.screen.ContainsText("PTX_NF54_NOTICE_FULL_2L_KINDERSICHERUNG_DEAKTIVIERT", bgColor=self.tf.colors.Black, hAlign=self.tf.horizontalAlignment.Center)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.Black)
+        
+#     # temporary substitute for navigation method
+#     def _EnterCleanMode(self):
+#         """
+#         Method entering Clean Mode.
+#         """
+#         self.tf.navigate.EnterHeatingMode()
+#         self.tf.ButtonTap(Button.Cleaning)
+#         assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_ECOCLEAN", bgColor=self.tf.colors.NeffDarkGray, expectTimeout = 10)
+        
+    @attr("normal", "PRJXENE-1325")
+    def TestEnterCleanModeDoorLatchOnChildLockOn(self):
+        """IntegrationTest/Neff/TestChildLock/TestPRJXENE1325_ChildLockWithDoorLatchAtSelfClean.py:TestPRJXENE1325ChildLockDoorLatchtSelfClean.TestEnterCleanModeDoorLatchOnChildLockOn
+            Given 'Cleaning Mode' menu is opened and 'DoorLatch' is turned on; 'Pyrolytic Self-Cleaning mode' is started.
+            When 'ChildLock' is turned on.
+            Then 'ChildLock' icon is displayed and 'DoorLatch' icon is not displayed on the screen.
+        """
+        # set preconditions
+        
+        # stage 1
+        self.tf.navigate.EnterCleanMode()
+        self._DoorLatchOnEcoClean()
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_50_Tuerverriegelung_26x26.png", bgColor=self.tf.colors.NeffDarkGray)
+        
+        # stage 2
+        self.tf.EncoderChange(Encoder.One, EncoderActions.Clockwise, 1)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.NeffDarkGray)
+        
+        # stage 3
+        self.tf.ButtonTap(Button.Cleaning)
+#         assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_TEXT_3L_10L_ENTFERNEN_SIE_UNGEEIGNETES_ZUBEHOER_LOSE_SPEISERESTE", bgColor=self.tf.colors.NeffDarkGray, hAlign=self.tf.horizontalAlignment.Center) # variant 1
+#         assert self.tf.screen.ContainsText("PTX_NF54_NOTICE_TEXT_3L_10L_ENTFERNEN_SIE_ZUBEHOER_ZUBEHOER__TRAEGER_LOSE_SPEISERESTE", bgColor=self.tf.colors.NeffDarkGray, hAlign=self.tf.horizontalAlignment.Center) # variant 2
+        sleep(self.MEDIUM_DELAY)
+        
+        # stage 4
+        self.tf.ButtonTap(Button.Cleaning)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_01_29_Pyrolyse_42x42.png", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_50_Tuerverriegelung_26x26.png", bgColor=self.tf.colors.Black)
+        
+        # set trigger
+        self._ChildLockOnSelfClean()
+        
+        # evaluate expected result
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_26_Kindersicherung_26x26.png", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.NotContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_50_Tuerverriegelung_26x26.png", bgColor=self.tf.colors.Black)
+        assert self.tf.IsDoorLatchActive()
+        
+    @attr("normal", "PRJXENE-1325")
+    def TestSelectSelfCleanDoorLatchOnChildLockOn(self):
+        """IntegrationTest/Neff/TestChildLock/TestPRJXENE1325_ChildLockWithDoorLatchAtSelfClean.py:TestPRJXENE1325ChildLockDoorLatchtSelfClean.TestSelectSelfCleanDoorLatchOnChildLockOn
+            Given 'Pyrolytic Self-Cleaning mode' in 'Cleaning Mode' menu is selected and 'DoorLatch' is turned on; 'Pyrolytic Self-Cleaning mode' is started.
+            When 'ChildLock' is turned on.
+            Then 'ChildLock' icon is displayed and 'DoorLatch' icon is not displayed on the screen.
+        """
+        # set preconditions
+        
+        # stage 1
+        self.tf.navigate.EnterCleanMode()
+        
+        # stage 2
+        self.tf.EncoderChange(Encoder.One, EncoderActions.Clockwise, 1)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.NeffDarkGray)
+        self._DoorLatchOnSelfClean()
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_50_Tuerverriegelung_26x26.png", bgColor=self.tf.colors.NeffDarkGray)
+        
+        # stage 3
+        self.tf.ButtonTap(Button.Cleaning)
+#         assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_TEXT_3L_10L_ENTFERNEN_SIE_UNGEEIGNETES_ZUBEHOER_LOSE_SPEISERESTE", bgColor=self.tf.colors.NeffDarkGray, hAlign=self.tf.horizontalAlignment.Center) # variant 1
+#         assert self.tf.screen.ContainsText("PTX_NF54_NOTICE_TEXT_3L_10L_ENTFERNEN_SIE_ZUBEHOER_ZUBEHOER__TRAEGER_LOSE_SPEISERESTE", bgColor=self.tf.colors.NeffDarkGray, hAlign=self.tf.horizontalAlignment.Center) # variant 2
+        sleep(self.MEDIUM_DELAY)
+        
+        # stage 4
+        self.tf.ButtonTap(Button.Cleaning)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_01_29_Pyrolyse_42x42.png", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_50_Tuerverriegelung_26x26.png", bgColor=self.tf.colors.Black)
+        
+        # set trigger
+        self._ChildLockOnSelfClean()
+        
+        # evaluate expected result
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_26_Kindersicherung_26x26.png", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.NotContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_50_Tuerverriegelung_26x26.png", bgColor=self.tf.colors.Black)
+        assert self.tf.IsDoorLatchActive()
+        
+    @attr("normal", "PRJXENE-1325")
+    def TestConfirmSelfCleanDoorLatchOnChildLockOn(self):
+        """IntegrationTest/Neff/TestChildLock/TestPRJXENE1325_ChildLockWithDoorLatchAtSelfClean.py:TestPRJXENE1325ChildLockDoorLatchtSelfClean.TestConfirmSelfCleanDoorLatchOnChildLockOn
+            Given 'Pyrolytic Self-Cleaning mode' in 'Cleaning Mode' menu is selected and confirmed by taping button 'Cleaning'; 'DoorLatch' is turned on;
+                  'Pyrolytic Self-Cleaning mode' is started.
+            When 'ChildLock' is turned on.
+            Then 'ChildLock' icon is displayed and 'DoorLatch' icon is not displayed on the screen.
+        """
+        # set preconditions
+        
+        # stage 1
+        self.tf.navigate.EnterCleanMode()
+        
+        # stage 2
+        self.tf.EncoderChange(Encoder.One, EncoderActions.Clockwise, 1)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.NeffDarkGray)
+        
+        # stage 3
+        self.tf.ButtonTap(Button.Cleaning)
+#         assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_TEXT_3L_10L_ENTFERNEN_SIE_UNGEEIGNETES_ZUBEHOER_LOSE_SPEISERESTE", bgColor=self.tf.colors.NeffDarkGray, hAlign=self.tf.horizontalAlignment.Center) # variant 1
+#         assert self.tf.screen.ContainsText("PTX_NF54_NOTICE_TEXT_3L_10L_ENTFERNEN_SIE_ZUBEHOER_ZUBEHOER__TRAEGER_LOSE_SPEISERESTE", bgColor=self.tf.colors.NeffDarkGray, hAlign=self.tf.horizontalAlignment.Center) # variant 2
+        sleep(self.MEDIUM_DELAY)
+        self._DoorLatchOnRemoveAccessories()
+        sleep(self.LONG_DELAY)
+        
+        # stage 4
+        self.tf.ButtonTap(Button.Cleaning)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_01_29_Pyrolyse_42x42.png", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_50_Tuerverriegelung_26x26.png", bgColor=self.tf.colors.Black)
+        
+        # set trigger
+        self._ChildLockOnSelfClean()
+        
+        # evaluate expected result
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_26_Kindersicherung_26x26.png", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.NotContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_50_Tuerverriegelung_26x26.png", bgColor=self.tf.colors.Black)
+        assert self.tf.IsDoorLatchActive()
+        
+    @attr("normal", "PRJXENE-1325")
+    def TestStartSelfCleanDoorLatchOnChildLockOn(self):
+        """IntegrationTest/Neff/TestChildLock/TestPRJXENE1325_ChildLockWithDoorLatchAtSelfClean.py:TestPRJXENE1325ChildLockDoorLatchtSelfClean.TestStartSelfCleanDoorLatchOnChildLockOn
+            Given 'Pyrolytic Self-Cleaning mode' is started and 'DoorLatch' is turned on.
+            When 'ChildLock' is turned on.
+            Then 'ChildLock' icon is displayed and 'DoorLatch' icon is not displayed on the screen.
+        """
+        # set preconditions
+        
+        # stage 1
+        self.tf.navigate.EnterCleanMode()
+        
+        # stage 2
+        self.tf.EncoderChange(Encoder.One, EncoderActions.Clockwise, 1)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.NeffDarkGray)
+        
+        # stage 3
+        self.tf.ButtonTap(Button.Cleaning)
+#         assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_TEXT_3L_10L_ENTFERNEN_SIE_UNGEEIGNETES_ZUBEHOER_LOSE_SPEISERESTE", bgColor=self.tf.colors.NeffDarkGray, hAlign=self.tf.horizontalAlignment.Center) # variant 1
+#         assert self.tf.screen.ContainsText("PTX_NF54_NOTICE_TEXT_3L_10L_ENTFERNEN_SIE_ZUBEHOER_ZUBEHOER__TRAEGER_LOSE_SPEISERESTE", bgColor=self.tf.colors.NeffDarkGray, hAlign=self.tf.horizontalAlignment.Center) # variant 2
+        sleep(self.MEDIUM_DELAY)
+        
+        # stage 4
+        self.tf.ButtonTap(Button.Cleaning)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_01_29_Pyrolyse_42x42.png", bgColor=self.tf.colors.Black)
+        self._DoorLatchOnSelfCleanStarted()
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_50_Tuerverriegelung_26x26.png", bgColor=self.tf.colors.Black)
+        
+        # set trigger
+        self._ChildLockOnSelfClean()
+        
+        # evaluate expected result
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_26_Kindersicherung_26x26.png", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.NotContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_50_Tuerverriegelung_26x26.png", bgColor=self.tf.colors.Black)
+        assert self.tf.IsDoorLatchActive()
+        
+    @attr("normal", "PRJXENE-1325")
+    def TestStartSelfCleanChildLockOnDoorLatchOn(self):
+        """IntegrationTest/Neff/TestChildLock/TestPRJXENE1325_ChildLockWithDoorLatchAtSelfClean.py:TestPRJXENE1325ChildLockDoorLatchtSelfClean.TestSelectSelfCleanChildLockOnDoorLatchOn
+            Given 'Pyrolytic Self-Cleaning mode' is started and 'ChildLock' is turned on.
+            When 'DoorLatch' is turned on.
+            Then 'DoorLatch' icon is displayed and 'ChildLock' icon is not displayed on the screen.
+        """
+        # set preconditions
+        
+        # stage 1
+        self.tf.navigate.EnterCleanMode()
+        
+        # stage 2
+        self.tf.EncoderChange(Encoder.One, EncoderActions.Clockwise, 1)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.NeffDarkGray)
+        
+        # stage 3
+        self.tf.ButtonTap(Button.Cleaning)
+#         assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_TEXT_3L_10L_ENTFERNEN_SIE_UNGEEIGNETES_ZUBEHOER_LOSE_SPEISERESTE", bgColor=self.tf.colors.NeffDarkGray, hAlign=self.tf.horizontalAlignment.Center) # variant 1
+#         assert self.tf.screen.ContainsText("PTX_NF54_NOTICE_TEXT_3L_10L_ENTFERNEN_SIE_ZUBEHOER_ZUBEHOER__TRAEGER_LOSE_SPEISERESTE", bgColor=self.tf.colors.NeffDarkGray, hAlign=self.tf.horizontalAlignment.Center) # variant 2
+        sleep(self.MEDIUM_DELAY)
+        
+        # stage 4
+        self.tf.ButtonTap(Button.Cleaning)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_01_29_Pyrolyse_42x42.png", bgColor=self.tf.colors.Black)
+        self._ChildLockOnSelfClean()
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_26_Kindersicherung_26x26.png", bgColor=self.tf.colors.Black)
+        
+        # set trigger
+        self._DoorLatchOnSelfCleanStarted()
+        
+        # evaluate expected result
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_50_Tuerverriegelung_26x26.png")
+        assert self.tf.screen.NotContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_26_Kindersicherung_26x26.png")
+        
+    @attr("normal", "PRJXENE-1325")
+    def TestStartSelfCleanChildLockOnDoorLatchOnDoorLatchOff(self):
+        """IntegrationTest/Neff/TestChildLock/TestPRJXENE1325_ChildLockWithDoorLatchAtSelfClean.py:TestPRJXENE1325ChildLockDoorLatchtSelfClean.TestSelectSelfCleanChildLockOnDoorLatchOnDoorLatchOff
+            Given 'Pyrolytic Self-Cleaning mode' is started; 'ChildLock' and 'DoorLatch' are turned on.
+            When 'DoorLatch' is turned off.
+            Then 'ChildLock' icon is displayed and 'DoorLatch' icon is not displayed on the screen.
+        """
+        # set preconditions
+        
+        # stage 1
+        self.tf.navigate.EnterCleanMode()
+        
+        # stage 2
+        self.tf.EncoderChange(Encoder.One, EncoderActions.Clockwise, 1)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.NeffDarkGray)
+        
+        # stage 3
+        self.tf.ButtonTap(Button.Cleaning)
+#         assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_TEXT_3L_10L_ENTFERNEN_SIE_UNGEEIGNETES_ZUBEHOER_LOSE_SPEISERESTE", bgColor=self.tf.colors.NeffDarkGray, hAlign=self.tf.horizontalAlignment.Center) # variant 1
+#         assert self.tf.screen.ContainsText("PTX_NF54_NOTICE_TEXT_3L_10L_ENTFERNEN_SIE_ZUBEHOER_ZUBEHOER__TRAEGER_LOSE_SPEISERESTE", bgColor=self.tf.colors.NeffDarkGray, hAlign=self.tf.horizontalAlignment.Center) # variant 2
+        sleep(self.MEDIUM_DELAY)
+        
+        # stage 4
+        self.tf.ButtonTap(Button.Cleaning)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_01_29_Pyrolyse_42x42.png", bgColor=self.tf.colors.Black)
+        self._ChildLockOnSelfClean()
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_26_Kindersicherung_26x26.png", bgColor=self.tf.colors.Black)
+        self._DoorLatchOnSelfCleanStarted()
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_50_Tuerverriegelung_26x26.png", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.NotContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_26_Kindersicherung_26x26.png", bgColor=self.tf.colors.Black)
+        
+        # set trigger
+        self._DoorLatchOff()
+        
+        # evaluate expected result
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_26_Kindersicherung_26x26.png", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.NotContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_50_Tuerverriegelung_26x26.png", bgColor=self.tf.colors.Black)
+        
+    @attr("normal", "PRJXENE-1325")
+    def TestStartSelfCleanChildLockOnDoorLatchOnChildLockOff(self):
+        """IntegrationTest/Neff/TestChildLock/TestPRJXENE1325_ChildLockWithDoorLatchAtSelfClean.py:TestPRJXENE1325ChildLockDoorLatchtSelfClean.TestSelectSelfCleanChildLockOnDoorLatchOnChildLockOff
+            Given 'Pyrolytic Self-Cleaning mode' is started; 'ChildLock' and 'DoorLatch' are turned on.
+            When 'ChildLock' is turned off.
+            Then 'DoorLatch' icon and 'ChildLock' icon are not displayed on the screen.
+        """
+        # set preconditions
+        
+        # stage 1
+        self.tf.navigate.EnterCleanMode()
+        
+        # stage 2
+        self.tf.EncoderChange(Encoder.One, EncoderActions.Clockwise, 1)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.NeffDarkGray)
+        
+        # stage 3
+        self.tf.ButtonTap(Button.Cleaning)
+#         assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_TEXT_3L_10L_ENTFERNEN_SIE_UNGEEIGNETES_ZUBEHOER_LOSE_SPEISERESTE", bgColor=self.tf.colors.NeffDarkGray, hAlign=self.tf.horizontalAlignment.Center) # variant 1
+#         assert self.tf.screen.ContainsText("PTX_NF54_NOTICE_TEXT_3L_10L_ENTFERNEN_SIE_ZUBEHOER_ZUBEHOER__TRAEGER_LOSE_SPEISERESTE", bgColor=self.tf.colors.NeffDarkGray, hAlign=self.tf.horizontalAlignment.Center) # variant 2
+        sleep(self.MEDIUM_DELAY)
+        
+        # stage 4
+        self.tf.ButtonTap(Button.Cleaning)
+        assert self.tf.screen.ContainsText("PTX_NF54_CLEAN_MODE_2L_PYROLYTISCHE_SELBSTREINIGUNG", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_01_29_Pyrolyse_42x42.png", bgColor=self.tf.colors.Black)
+        self._ChildLockOnSelfClean()
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_26_Kindersicherung_26x26.png", bgColor=self.tf.colors.Black)
+        self._DoorLatchOnSelfCleanStarted()
+        assert self.tf.screen.ContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_50_Tuerverriegelung_26x26.png", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.NotContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_26_Kindersicherung_26x26.png", bgColor=self.tf.colors.Black)
+        
+        # set trigger
+        self._ChildLockOffSelfClean()
+        
+        # evaluate expected result
+        assert self.tf.screen.NotContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_50_Tuerverriegelung_26x26.png", bgColor=self.tf.colors.Black)
+        assert self.tf.screen.NotContainsPng(self.TEST_GRAPHICS + "XE54_NF_00_26_Kindersicherung_26x26.png", bgColor=self.tf.colors.Black)
