@@ -8,9 +8,9 @@ from copy import deepcopy
 
 
 def modify_docstring(text):
-    mod1 = text.replace('            Given', '** *Given*')
-    mod2 = mod1.replace('            When', '** *When*')
-    mod3 = mod2.replace('            Then', '** *Then*')
+    mod1 = text.replace('            GIVEN', '** *Given*')
+    mod2 = mod1.replace('            WHEN', '** *When*')
+    mod3 = mod2.replace('            THEN', '** *Then*')
     mod4 = mod3.replace('IntegrationTest/', '* IntegrationTest/')
     mod5 = mod4.replace('        ', '')
     return mod5
